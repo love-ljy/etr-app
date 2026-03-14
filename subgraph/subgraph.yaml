@@ -1,0 +1,132 @@
+# ETR DApp Subgraph
+# The Graph 配置文件
+
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  # StakingPool 合约
+  - kind: ethereum
+    name: StakingPool
+    network: bsc-testnet  # 或 bsc (主网)
+    source:
+      address: "0x..."  # 部署后填写 StakingPool 地址
+      abi: StakingPool
+      startBlock: 0  # 部署区块号
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - StakeRecord
+        - RewardClaim
+        - UserStats
+      abis:
+        - name: StakingPool
+          file: ./abis/StakingPool.json
+      eventHandlers:
+        - event: Staked(indexed address,indexed uint256,uint256,uint256,uint256)
+          handler: handleStaked
+        - event: Unstaked(indexed address,indexed uint256,uint256,uint256)
+          handler: handleUnstaked
+        - event: RewardClaimed(indexed address,indexed uint256,uint256,uint256)
+          handler: handleRewardClaimed
+        - event: AllRewardsClaimed(indexed address,uint256,uint256)
+          handler: handleAllRewardsClaimed
+        - event: StakeRecordUpdated(indexed uint256,uint256,uint256)
+          handler: handleStakeRecordUpdated
+        - event: AccountStatusChanged(indexed address,bool,uint256,uint256)
+          handler: handleAccountStatusChanged
+        - event: YieldRateUpdated(uint256,uint256,uint256)
+          handler: handleYieldRateUpdated
+      file: ./src/mappings/stakingPool.ts
+
+  # CompoundPool 合约
+  - kind: ethereum
+    name: CompoundPool
+    network: bsc-testnet
+    source:
+      address: "0x..."  # 部署后填写 CompoundPool 地址
+      abi: CompoundPool
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - CompoundRecord
+        - CompoundStats
+      abis:
+        - name: CompoundPool
+          file: ./abis/CompoundPool.json
+      eventHandlers:
+        - event: RewardDeposited(indexed address,uint256,uint256,uint256)
+          handler: handleRewardDeposited
+        - event: CompoundClaimed(indexed address,uint256,uint256)
+          handler: handleCompoundClaimed
+        - event: CompoundTransferredToBalance(indexed address,uint256,uint256)
+          handler: handleCompoundTransferred
+        - event: CompoundCalculated(indexed address,uint256,uint256,uint256)
+          handler: handleCompoundCalculated
+        - event: YieldRateUpdated(uint256,uint256,uint256)
+          handler: handleCompoundYieldRateUpdated
+      file: ./src/mappings/compoundPool.ts
+
+  # ReferralSystemV2 合约
+  - kind: ethereum
+    name: ReferralSystemV2
+    network: bsc-testnet
+    source:
+      address: "0x..."  # 部署后填写 ReferralSystemV2 地址
+      abi: ReferralSystemV2
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - ReferralRecord
+        - ReferralStats
+        - ReferrerBinding
+      abis:
+        - name: ReferralSystemV2
+          file: ./abis/ReferralSystemV2.json
+      eventHandlers:
+        - event: ReferralBound(indexed address,indexed address,uint256)
+          handler: handleReferralBound
+        - event: ReferralRewardDistributed(indexed address,indexed uint256,uint256,uint256)
+          handler: handleReferralRewardDistributed
+        - event: ReferralStatsUpdated(indexed address,uint256,uint256,uint256)
+          handler: handleReferralStatsUpdated
+        - event: LineRewardCalculated(indexed address,indexed uint256,uint256,uint256,uint256)
+          handler: handleLineRewardCalculated
+      file: ./src/mappings/referralSystem.ts
+
+  # DividendPool 合约
+  - kind: ethereum
+    name: DividendPool
+    network: bsc-testnet
+    source:
+      address: "0x..."  # 部署后填写 DividendPool 地址
+      abi: DividendPool
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - DividendClaim
+        - DividendDistribution
+      abis:
+        - name: DividendPool
+          file: ./abis/DividendPool.json
+      eventHandlers:
+        - event: DividendClaimed(indexed address,uint256,uint8)
+          handler: handleDividendClaimed
+        - event: DividendDistributed(uint256,uint256,uint256,uint256,uint256)
+          handler: handleDividendDistributed
+        - event: DividendDeposited(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleDividendDeposited
+        - event: UserLevelUpdated(indexed address,uint8,uint8)
+          handler: handleUserLevelUpdated
+      file: ./src/mappings/dividendPool.ts

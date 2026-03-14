@@ -1,0 +1,224 @@
+# GraphQL Schema for ETR DApp Subgraph
+
+# ==================== 用户相关 ====================
+type User @entity {
+  id: ID!                          # 用户地址
+  address: Bytes!
+  
+  # 质押相关
+  stakes: [StakeRecord!]! @derivedFrom(field: "user")
+  totalStaked: BigInt!
+  totalClaimed: BigInt!
+  stakeCount: Int!
+  
+  # 复利相关
+  compoundRecords: [CompoundRecord!]! @derivedFrom(field: "user")
+  totalCompoundDeposited: BigInt!
+  totalCompoundClaimed: BigInt!
+  totalCompoundTransferred: BigInt!
+  currentCompoundBalance: BigInt!
+  
+  # 推荐相关
+  referrer: ReferrerBinding
+  referrals: [ReferralRecord!]! @derivedFrom(field: "referrer")
+  referralCount: Int!
+  directCount: Int!
+  indirectCount: Int!
+  deepCount: Int!
+  totalReferralRewards: BigInt!
+  
+  # 分红相关
+  dividendClaims: [DividendClaim!]! @derivedFrom(field: "user")
+  totalDividendClaimed: BigInt!
+  currentDividendLevel: Int!
+  
+  # 创建时间
+  createdAt: BigInt!
+  updatedAt: BigInt!
+}
+
+# ==================== 质押相关 ====================
+type StakeRecord @entity {
+  id: ID!                          # stakeId
+  stakeId: BigInt!
+  user: User!
+  
+  amount: BigInt!                  # 质押金额
+  originalAmount: BigInt!          # 原始金额
+  
+  startTime: BigInt!               # 开始时间
+  unlockTime: BigInt!              # 解锁时间
+  
+  status: StakeStatus!             # 状态
+  
+  # 领取记录
+  claims: [RewardClaim!]! @derivedFrom(field: "stakeRecord")
+  totalClaimed: BigInt!
+  
+  createdAt: BigInt!
+  updatedAt: BigInt!
+}
+
+enum StakeStatus {
+  ACTIVE
+  UNLOCKED
+  CLAIMED
+  EMERGENCY_UNSTAKED
+}
+
+type RewardClaim @entity {
+  id: ID!                          # txHash-logIndex
+  stakeRecord: StakeRecord
+  user: User!
+  
+  amount: BigInt!                  # 领取金额
+  stakeId: BigInt!
+  
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txHash: Bytes!
+}
+
+type YieldRateUpdate @entity {
+  id: ID!                          # blockNumber-logIndex
+  oldRate: BigInt!
+  newRate: BigInt!
+  timestamp: BigInt!
+}
+
+# ==================== 复利相关 ====================
+type CompoundRecord @entity {
+  id: ID!                          # txHash-logIndex
+  user: User!
+  
+  type: CompoundType!              # 记录类型
+  amount: BigInt!                  # 金额
+  newBalance: BigInt!              # 操作后余额
+  
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txHash: Bytes!
+}
+
+enum CompoundType {
+  DEPOSIT        # 收益存入复利池
+  CLAIM          # 提取复利
+  TRANSFER       # 划转至余额
+  CALCULATED     # 每日复利计算
+}
+
+type CompoundStats @entity {
+  id: ID!                          # user address
+  user: User!
+  
+  totalDeposited: BigInt!
+  totalClaimed: BigInt!
+  totalTransferred: BigInt!
+  currentBalance: BigInt!
+  
+  lastUpdated: BigInt!
+}
+
+# ==================== 推荐相关 ====================
+type ReferrerBinding @entity {
+  id: ID!                          # user address
+  user: User!
+  referrer: User!                  # 推荐人
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txHash: Bytes!
+}
+
+type ReferralRecord @entity {
+  id: ID!                          # txHash-logIndex
+  referrer: User!                  # 推荐人
+  referee: User!                   # 被推荐人
+  
+  generation: Int!                 # 层级 (1-直推, 2-间推, 3-深推)
+  rewardAmount: BigInt!            # 奖励金额
+  burnAmount: BigInt!              # 燃烧金额
+  
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txHash: Bytes!
+}
+
+type ReferralStatsUpdate @entity {
+  id: ID!                          # txHash-logIndex
+  user: User!
+  
+  directCount: BigInt!
+  secondGenCount: BigInt!
+  thirdGenCount: BigInt!
+  
+  timestamp: BigInt!
+  blockNumber: BigInt!
+}
+
+# ==================== 分红相关 ====================
+type DividendClaim @entity {
+  id: ID!                          # txHash-logIndex
+  user: User!
+  
+  amount: BigInt!                  # 领取金额
+  level: Int!                      # 分红等级
+  
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  txHash: Bytes!
+}
+
+type DividendDistribution @entity {
+  id: ID!                          # blockNumber
+  timestamp: BigInt!
+  
+  totalAmount: BigInt!
+  v1Amount: BigInt!
+  v2Amount: BigInt!
+  v3Amount: BigInt!
+  
+  participantCount: Int!
+}
+
+# ==================== 系统统计 ====================
+type SystemStats @entity {
+  id: ID!                          # 固定 ID: "SYSTEM"
+  
+  # 质押统计
+  totalStaked: BigInt!
+  totalRewardsDistributed: BigInt!
+  activeStakers: Int!
+  currentYieldRate: BigInt!
+  
+  # 复利统计
+  totalCompoundPool: BigInt!
+  
+  # 分红统计
+  totalDividendDistributed: BigInt!
+  
+  # 推荐统计
+  totalReferrals: Int!
+  totalReferralRewards: BigInt!
+  
+  updatedAt: BigInt!
+}
+
+# ==================== 时间序列数据（用于图表）====================
+type DailyStats @entity {
+  id: ID!                          # YYYY-MM-DD
+  date: String!
+  timestamp: BigInt!
+  
+  # 当日数据
+  newStakes: Int!
+  totalStakedAmount: BigInt!
+  
+  newCompoundDeposits: Int!
+  totalCompoundAmount: BigInt!
+  
+  newReferrals: Int!
+  totalReferralRewards: BigInt!
+  
+  rewardClaims: Int!
+  totalRewardAmount: BigInt!
+}

@@ -1,0 +1,32 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19;
+
+/**
+ * @title MockPancakePair
+ * @dev Mock PancakeSwap Pair for testing
+ */
+contract MockPancakePair {
+    uint112 private reserve0;
+    uint112 private reserve1;
+    uint32 private blockTimestampLast;
+    address public token0;
+    address public token1;
+    
+    uint256 public price0CumulativeLast;
+    uint256 public price1CumulativeLast;
+    
+    function setReserves(uint112 _reserve0, uint112 _reserve1) external {
+        reserve0 = _reserve0;
+        reserve1 = _reserve1;
+        blockTimestampLast = uint32(block.timestamp);
+    }
+    
+    function getReserves() external view returns (uint112, uint112, uint32) {
+        return (reserve0, reserve1, blockTimestampLast);
+    }
+    
+    function setTokens(address _token0, address _token1) external {
+        token0 = _token0;
+        token1 = _token1;
+    }
+}
