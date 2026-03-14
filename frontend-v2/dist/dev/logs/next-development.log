@@ -1,0 +1,10 @@
+[00:00:00.559] Server  LOG     ✓ Ready in 408ms
+[04:07:44.973] Server  LOG     ✓ Compiled in 733ms
+[04:07:45.243] Browser WARN    Unexpected import of module [project]/node_modules/viem/_esm/utils/ccip.js [app-client] (ecmascript, async loader) from module [project]/node_modules/viem/_esm/actions/public/call.js [app-client] (ecmascript), which was deleted by an HMR update
+[04:07:45.243] Browser WARN    Unexpected import of module [project]/node_modules/viem/_esm/utils/ccip.js [app-client] (ecmascript, async loader) from module [project]/node_modules/viem/_esm/actions/public/call.js [app-client] (ecmascript), which was deleted by an HMR update
+[04:07:45.243] Browser WARN    Unexpected import of module [project]/node_modules/viem/_esm/utils/ccip.js [app-client] (ecmascript, async loader) from module [project]/node_modules/viem/_esm/actions/public/call.js [app-client] (ecmascript), which was deleted by an HMR update
+[04:07:45.243] Browser WARN    Unexpected import of module [project]/node_modules/viem/_esm/utils/ccip.js [app-client] (ecmascript, async loader) from module [project]/node_modules/viem/_esm/actions/public/call.js [app-client] (ecmascript), which was deleted by an HMR update
+[04:07:45.243] Browser WARN    Unexpected import of module [project]/node_modules/viem/_esm/utils/ccip.js [app-client] (ecmascript, async loader) from module [project]/node_modules/viem/_esm/actions/public/call.js [app-client] (ecmascript), which was deleted by an HMR update
+[04:07:45.243] Browser WARN    Unexpected import of module [project]/node_modules/viem/_esm/utils/ccip.js [app-client] (ecmascript, async loader) from module [project]/node_modules/viem/_esm/actions/public/call.js [app-client] (ecmascript), which was deleted by an HMR update
+[04:07:45.532] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[04:09:05.558] Server  LOG     ✓ Compiled in 166ms

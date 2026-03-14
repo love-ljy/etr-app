@@ -1,0 +1,92 @@
+/* Tailwind CSS v4 */
+@import "tailwindcss";
+
+/* 字体类 */
+.font-sans {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.font-display {
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+}
+
+/* 渐变文字 */
+.gradient-text-cyber {
+  background: linear-gradient(135deg, #00f5ff, #ff00ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-gold {
+  background: linear-gradient(135deg, #ffd700, #ff8c00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-green {
+  background: linear-gradient(135deg, #00ff88, #00cc6a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 霓虹发光 */
+.neon-glow-cyan {
+  box-shadow: 0 0 10px rgba(0, 245, 255, 0.5),
+              0 0 20px rgba(0, 245, 255, 0.3),
+              0 0 30px rgba(0, 245, 255, 0.2);
+}
+
+.neon-glow-magenta {
+  box-shadow: 0 0 10px rgba(255, 0, 255, 0.5),
+              0 0 20px rgba(255, 0, 255, 0.3),
+              0 0 30px rgba(255, 0, 255, 0.2);
+}
+
+/* 玻璃卡片 */
+.glass-card {
+  background: rgba(20, 20, 35, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 主题：浅色模式 */
+html.light body {
+  background-color: #f0f4f8 !important;
+  color: #1a202c !important;
+}
+
+html.light .bg-black {
+  background-color: #f0f4f8 !important;
+}
+
+html.light [style*="background: rgba(10"],
+html.light [style*="background: rgba(20"] {
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 245, 255, 0.3);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 245, 255, 0.5);
+}
