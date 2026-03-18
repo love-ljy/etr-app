@@ -1,19 +1,17 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
-import { 
-  useAccount, 
-  useConnect, 
-  useDisconnect, 
-  useBalance, 
+import { useCallback } from 'react';
+import {
+  useAccount,
+  useDisconnect,
+  useBalance,
   useReadContract,
   useChainId,
   useSwitchChain,
 } from 'wagmi';
+import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { ETRTokenABI } from '@/lib/abis/ETRToken';
 import { getContractAddresses, USDT_ADDRESS, USDT_ADDRESS_TESTNET } from '@/lib/web3/contracts';
-
-export type WalletType = 'metamask' | 'walletconnect';
 
 export interface WalletInfo {
   address: string;
@@ -36,20 +34,24 @@ const USDT_ABI = [
   },
 ] as const;
 
+/**
+ * 钱包连接 Hook - 集成 Web3Modal
+ * 提供钱包连接、余额查询、链切换等功能
+ */
 export function useWallet() {
-  const { address, isConnected, isConnecting: isAccountConnecting } = useAccount();
+  const { address, isConnected, isConnecting } = useAccount();
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
-  const { connect, connectors, isPending: isConnectPending } = useConnect();
   const { disconnect } = useDisconnect();
-  
+  const { open } = useWeb3Modal(); // Web3Modal hook
+
   // 获取原生代币(BNB)余额
   const { data: balanceData } = useBalance({
     address: address,
   });
 
   const contracts = getContractAddresses();
-  
+
   // 获取ETR代币余额
   const { data: etrBalanceData, refetch: refetchEtrBalance } = useReadContract({
     address: contracts.ETRToken as `0x${string}`,
@@ -73,9 +75,6 @@ export function useWallet() {
     },
   });
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedWallet, setSelectedWallet] = useState<WalletType | null>(null);
-
   // 格式化地址显示
   const formatAddress = useCallback((addr: string | undefined): string => {
     if (!addr) return '';
@@ -98,61 +97,18 @@ export function useWallet() {
     usdtBalance: formatBalance(usdtBalanceData, 18),
     chainId: chainId || 0,
     isConnected,
-    isConnecting: isAccountConnecting || isConnectPending,
+    isConnecting,
   };
 
-  // 连接钱包
-  const connectWallet = useCallback(async (walletType: WalletType) => {
-    try {
-      setSelectedWallet(walletType);
-      
-      console.log('Available connectors:', connectors.map(c => ({ id: c.id, name: c.name })));
-      
-      const connector = connectors.find(c => {
-        if (walletType === 'walletconnect') {
-          return c.id === 'walletConnect';
-        }
-        // injected 支持所有浏览器钱包 (MetaMask, TrustWallet等)
-        return c.id === 'injected';
-      });
-
-      if (!connector) {
-        const availableIds = connectors.map(c => c.id).join(', ');
-        throw new Error(`连接器未找到。可用连接器: ${availableIds}. 请确保已安装MetaMask或其他Web3钱包`);
-      }
-
-      console.log('Connecting with connector:', connector.id);
-      await connect({ connector });
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error('连接钱包失败:', error);
-      // 提供更友好的错误信息
-      if (error instanceof Error) {
-        if (error.message.includes('User rejected')) {
-          throw new Error('用户取消了连接请求');
-        } else if (error.message.includes('provider')) {
-          throw new Error('未检测到Web3钱包，请安装MetaMask或TrustWallet');
-        }
-      }
-      throw error;
-    }
-  }, [connect, connectors]);
+  // 打开 Web3Modal 连接弹窗
+  const openConnectModal = useCallback(() => {
+    open();
+  }, [open]);
 
   // 断开钱包连接
   const disconnectWallet = useCallback(() => {
     disconnect();
-    setSelectedWallet(null);
   }, [disconnect]);
-
-  // 打开连接弹窗
-  const openConnectModal = useCallback(() => {
-    setIsModalOpen(true);
-  }, []);
-
-  // 关闭连接弹窗
-  const closeConnectModal = useCallback(() => {
-    setIsModalOpen(false);
-  }, []);
 
   // 切换链
   const switchToChain = useCallback(async (targetChainId: number) => {
@@ -169,12 +125,8 @@ export function useWallet() {
 
   return {
     wallet,
-    connect: connectWallet,
-    disconnect: disconnectWallet,
-    isModalOpen,
     openConnectModal,
-    closeConnectModal,
-    selectedWallet,
+    disconnect: disconnectWallet,
     switchToChain,
     refreshBalances,
   };

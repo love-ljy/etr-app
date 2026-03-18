@@ -1,12 +1,11 @@
 'use client';
 
 import * as React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useWallet } from "@/lib/hooks";
-import { Wallet, ArrowRight, Shield, Zap, Globe, AlertCircle, Check } from "lucide-react";
+import { Wallet, ArrowRight, Shield, Zap, Globe, Check } from "lucide-react";
 import Link from "next/link";
 
 // 3D浮动动画
@@ -36,24 +35,6 @@ const breatheAnimation = {
   }
 };
 
-// 钱包选项
-const walletOptions = [
-  {
-    id: 'metamask' as const,
-    name: "MetaMask",
-    icon: "🦊",
-    description: "最流行的以太坊钱包",
-    popular: true,
-  },
-  {
-    id: 'walletconnect' as const,
-    name: "WalletConnect",
-    icon: "🔗",
-    description: "连接移动钱包",
-    popular: false,
-  },
-];
-
 // 特性列表
 const features = [
   { icon: <Shield size={20} />, text: "安全的智能合约" },
@@ -62,35 +43,14 @@ const features = [
 ];
 
 export default function ConnectWalletPage() {
-  const { wallet, connect, isModalOpen, openConnectModal, closeConnectModal } = useWallet();
-  const [selectedWallet, setSelectedWallet] = React.useState<typeof walletOptions[0]["id"] | null>(null);
-  const [isConnecting, setIsConnecting] = React.useState(false);
-  const [connectionError, setConnectionError] = React.useState<string | null>(null);
-  const [connectionSuccess, setConnectionSuccess] = React.useState(false);
+  const { wallet, openConnectModal } = useWallet();
 
   // 自动打开连接弹窗
   React.useEffect(() => {
-    openConnectModal();
-  }, [openConnectModal]);
-
-  const handleConnect = async (walletType: typeof walletOptions[0]["id"]) => {
-    setSelectedWallet(walletType);
-    setIsConnecting(true);
-    setConnectionError(null);
-    
-    try {
-      await connect(walletType);
-      setConnectionSuccess(true);
-      
-      // 2秒后跳转到首页
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 2000);
-    } catch (err) {
-      setConnectionError(err instanceof Error ? err.message : '连接失败，请重试');
-      setIsConnecting(false);
+    if (!wallet.isConnected) {
+      openConnectModal();
     }
-  };
+  }, [wallet.isConnected, openConnectModal]);
 
   // 如果已连接，显示已连接状态
   if (wallet.isConnected) {
@@ -164,87 +124,27 @@ export default function ConnectWalletPage() {
           transition={{ delay: 0.2, duration: 0.5 }}
         >
           <Card variant="neon" className="overflow-hidden" isHoverable={false}>
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-white">选择钱包</h2>
-                <Badge variant="cyan">Web3</Badge>
+            <div className="p-8 text-center">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#00f5ff] to-[#ff00ff] flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(0,245,255,0.4)]">
+                <Wallet size={40} className="text-black" />
               </div>
 
-              {/* 错误提示 */}
-              <AnimatePresence>
-                {connectionError && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="mb-4 p-3 rounded-lg bg-[#ff3366]/10 border border-[#ff3366]/30 flex items-center gap-2"
-                  >
-                    <AlertCircle size={16} className="text-[#ff3366]" />
-                    <span className="text-sm text-[#ff3366]">{connectionError}</span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <h2 className="text-2xl font-bold text-white mb-2">连接钱包</h2>
+              <p className="text-white/50 mb-8">选择您喜欢的钱包开始使用</p>
 
-              <div className="space-y-3">
-                {walletOptions.map((wallet, index) => (
-                  <motion.button
-                    key={wallet.id}
-                    className={`
-                      w-full flex items-center gap-4 p-4 rounded-xl border transition-all duration-300
-                      ${selectedWallet === wallet.id && isConnecting
-                        ? "bg-[#00f5ff]/10 border-[#00f5ff]/50 shadow-[0_0_20px_rgba(0,245,255,0.2)]" 
-                        : "bg-white/5 border-white/10 hover:border-white/20 hover:bg-white/10"
-                      }
-                      ${isConnecting ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}
-                    `}
-                    onClick={() => !isConnecting && handleConnect(wallet.id)}
-                    disabled={isConnecting}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 + index * 0.1 }}
-                    whileHover={!isConnecting ? { scale: 1.02 } : {}}
-                    whileTap={!isConnecting ? { scale: 0.98 } : {}}
-                  >
-                    <span className="text-2xl">{wallet.icon}</span>
-                    
-                    <div className="flex-1 text-left">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-white">{wallet.name}</span>
-                        {wallet.popular && (
-                          <Badge variant="magenta" className="text-[10px] px-2 py-0">热门</Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-white/40">{wallet.description}</p>
-                    </div>
-                    
-                    {selectedWallet === wallet.id && isConnecting ? (
-                      <motion.div
-                        className="w-5 h-5 border-2 border-[#00f5ff] border-t-transparent rounded-full"
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      />
-                    ) : (
-                      <ArrowRight 
-                        size={18} 
-                        className="text-white/30" 
-                      />
-                    )}
-                  </motion.button>
-                ))}
-              </div>
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={openConnectModal}
+                rightIcon={<ArrowRight size={18} />}
+                className="shadow-[0_0_30px_rgba(0,245,255,0.3)]"
+              >
+                打开钱包选择
+              </Button>
 
-              {/* 连接状态 */}
-              <AnimatePresence>
-                {isConnecting && (
-                  <motion.div
-                    className="mt-6 flex items-center justify-center gap-3 text-[#00f5ff]"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                  >
-                    <span className="text-sm">正在连接 {walletOptions.find(w => w.id === selectedWallet)?.name}...</span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <p className="text-xs text-white/30 mt-6">
+                支持 MetaMask、Trust Wallet、Coinbase Wallet 等多种钱包
+              </p>
             </div>
           </Card>
         </motion.div>

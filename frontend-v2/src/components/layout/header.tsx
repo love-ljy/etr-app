@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn, shortenAddress } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useWallet } from "@/lib/hooks";
-import { ConnectModal } from "@/components/connect-modal";
 import { Menu, Wallet, Copy, ExternalLink, ChevronDown, LogOut, Settings } from "lucide-react";
 import { SettingsModal } from "@/components/settings-modal";
 
@@ -16,9 +15,8 @@ interface HeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 export const Header = React.forwardRef<HTMLDivElement, HeaderProps>(
   ({ className, onMenuClick }, ref) => {
     const [showDropdown, setShowDropdown] = React.useState(false);
-    const [showConnectModal, setShowConnectModal] = React.useState(false);
     const [showSettingsModal, setShowSettingsModal] = React.useState(false);
-    const { wallet, disconnect } = useWallet();
+    const { wallet, disconnect, openConnectModal } = useWallet();
 
     return (
       <>
@@ -62,7 +60,7 @@ export const Header = React.forwardRef<HTMLDivElement, HeaderProps>(
                 variant="primary"
                 size="sm"
                 leftIcon={<Wallet size={18} />}
-                onClick={() => setShowConnectModal(true)}
+                onClick={openConnectModal}
                 className="shadow-[0_0_20px_rgba(0,245,255,0.3)]"
               >
                 连接钱包
@@ -160,12 +158,6 @@ export const Header = React.forwardRef<HTMLDivElement, HeaderProps>(
           </div>
         </div>
       </motion.header>
-
-      {/* 连接钱包弹窗 */}
-      <ConnectModal 
-        isOpen={showConnectModal} 
-        onClose={() => setShowConnectModal(false)} 
-      />
 
       {/* 设置弹窗 */}
       <SettingsModal
