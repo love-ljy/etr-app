@@ -9,7 +9,7 @@ import {
   useChainId,
   useSwitchChain,
 } from 'wagmi';
-import { useWeb3Modal } from '@web3modal/wagmi/react';
+import { useAppKit } from '@reown/appkit/react';
 import { ETRTokenABI } from '@/lib/abis/ETRToken';
 import { getContractAddresses, USDT_ADDRESS, USDT_ADDRESS_TESTNET } from '@/lib/web3/contracts';
 
@@ -43,7 +43,7 @@ export function useWallet() {
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
   const { disconnect } = useDisconnect();
-  const { open } = useWeb3Modal(); // Web3Modal hook
+  const { open } = useAppKit();
 
   // 获取原生代币(BNB)余额
   const { data: balanceData } = useBalance({

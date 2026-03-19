@@ -1,0 +1,19 @@
+
+// ETR DAPP 合约配置 - bscTestnet
+// 部署时间: 2026-03-18T15:23:01.804Z
+
+export const CONTRACT_ADDRESSES = {
+  ETRToken: "0xC163C4DFE7e8bAd2E3d9db64BF5EEf944F4484c5",
+  PriceOracle: "0xBF73DB25F5f58d206f1eaE05492ccb5643C08A38",
+  StakingPool: "0x3E08D67Ee44C7385EF57f2c1b0833f2eDe776789",
+  ReferralSystemV2: "0x1f990C344d9f72344684F5cF2E4ed18a59F62609",
+  CompoundPool: "0xcF1c5E6e94c16a0501eb0fa399D674826B3a4363",
+  DividendPool: "0x77e670EE1D0B4461B7399cf86f8624373FEB6b84",
+  SlippageController: "0xF6b61E9a65607198Ababe08c071Ae9eEaEaBee0A",
+};
+
+export const NETWORK_CONFIG = {
+  chainId: 97,
+  name: "bscTestnet",
+  rpcUrl: "https://bsc-dataseed.binance.org/"
+};

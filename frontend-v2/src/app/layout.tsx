@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
   title: "赤道ETR - DeFi Platform",
@@ -14,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body className="font-sans antialiased bg-black text-white">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

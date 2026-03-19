@@ -18,18 +18,28 @@ async function main() {
   // 1. 部署 ETRToken
   console.log("\n📝 部署 ETRToken...");
   const ETRToken = await ethers.getContractFactory("ETRToken");
-  const etrToken = await ETRToken.deploy();
+  // 黑洞地址：以太坊标准销毁地址
+  const blackHole = "0x000000000000000000000000000000000000dEaD";
+  // LP池地址：先用部署者地址，后续可通过setLpPool更新
+  const lpPool = deployer.address;
+  const etrToken = await ETRToken.deploy(blackHole, lpPool);
   await etrToken.waitForDeployment();
   deployments.ETRToken = await etrToken.getAddress();
   console.log("✅ ETRToken 部署成功:", deployments.ETRToken);
+  console.log("   黑洞地址:", blackHole);
+  console.log("   LP池地址:", lpPool, "(临时，后续可更新)");
 
   // 2. 部署 PriceOracle
   console.log("\n📝 部署 PriceOracle...");
   const PriceOracle = await ethers.getContractFactory("PriceOracle");
-  const priceOracle = await PriceOracle.deploy(deployments.ETRToken);
+  // 临时使用 deployer 地址作为 LP Pair，后续需要通过 setLPPair 更新为真实 LP 地址
+  const tempLPPair = deployer.address;
+  const isToken0ETR = true; // 假设 ETR 是 token0
+  const priceOracle = await PriceOracle.deploy(tempLPPair, isToken0ETR);
   await priceOracle.waitForDeployment();
   deployments.PriceOracle = await priceOracle.getAddress();
   console.log("✅ PriceOracle 部署成功:", deployments.PriceOracle);
+  console.log("   ⚠️  临时LP地址:", tempLPPair, "(需要后续更新)");
 
   // 3. 部署 StakingPool
   console.log("\n📝 部署 StakingPool...");
@@ -47,7 +57,6 @@ async function main() {
   const ReferralSystemV2 = await ethers.getContractFactory("ReferralSystemV2");
   const referralSystem = await ReferralSystemV2.deploy(
     deployments.StakingPool,
-    deployments.ETRToken,
     deployments.PriceOracle
   );
   await referralSystem.waitForDeployment();
@@ -58,8 +67,7 @@ async function main() {
   console.log("\n📝 部署 CompoundPool...");
   const CompoundPool = await ethers.getContractFactory("CompoundPool");
   const compoundPool = await CompoundPool.deploy(
-    deployments.ETRToken,
-    deployments.StakingPool
+    deployments.ETRToken
   );
   await compoundPool.waitForDeployment();
   deployments.CompoundPool = await compoundPool.getAddress();
@@ -68,24 +76,34 @@ async function main() {
   // 6. 部署 DividendPool
   console.log("\n📝 部署 DividendPool...");
   const DividendPool = await ethers.getContractFactory("DividendPool");
+  // 临时使用 deployer 地址作为治理地址和预售地址，后续可通过管理函数更新
+  const tempGovernance = deployer.address;
+  const tempPresale = deployer.address;
   const dividendPool = await DividendPool.deploy(
     deployments.ETRToken,
-    deployments.StakingPool
+    tempGovernance,
+    tempPresale
   );
   await dividendPool.waitForDeployment();
   deployments.DividendPool = await dividendPool.getAddress();
   console.log("✅ DividendPool 部署成功:", deployments.DividendPool);
+  console.log("   ⚠️  临时治理地址:", tempGovernance, "(需要后续更新)");
+  console.log("   ⚠️  临时预售地址:", tempPresale, "(需要后续更新)");
 
   // 7. 部署 SlippageController
   console.log("\n📝 部署 SlippageController...");
   const SlippageController = await ethers.getContractFactory("SlippageController");
+  // 临时使用 deployer 地址作为 LP 池地址，后续可更新
+  const tempLpPool = deployer.address;
   const slippageController = await SlippageController.deploy(
     deployments.ETRToken,
-    deployments.PriceOracle
+    deployments.PriceOracle,
+    tempLpPool
   );
   await slippageController.waitForDeployment();
   deployments.SlippageController = await slippageController.getAddress();
   console.log("✅ SlippageController 部署成功:", deployments.SlippageController);
+  console.log("   ⚠️  临时LP池地址:", tempLpPool, "(需要后续更新)");
 
   // 配置合约关联
   console.log("\n🔧 配置合约关联...");
