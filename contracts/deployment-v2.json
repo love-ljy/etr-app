@@ -1,0 +1,18 @@
+{
+  "network": "bscTestnet",
+  "chainId": 97,
+  "deployer": "0x4343d520a0e6182d22ec0c0134508571e782a0AB",
+  "timestamp": "2026-03-19T11:29:18.756Z",
+  "contracts": {
+    "ETRToken": "0xaC6557be96B7f661Ab60438bc42194Cd50188Ab8",
+    "StakingPoolV2": "0x3795ddAfD4E651eD67593490Bfc0037Ae2be34d8",
+    "CompoundPoolV2": "0xE6F3eC98d05bBe327Fa046fBB6460cE5bDd93e8e",
+    "ReferralSystem": "0xFC67f6AC14f131a92ee2F03D96292c9DeC224433",
+    "USDT": "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd"
+  },
+  "config": {
+    "etrPriceUSD": "0.25",
+    "lockPeriodDays": 50,
+    "dailyYieldRate": "0.45%"
+  }
+}

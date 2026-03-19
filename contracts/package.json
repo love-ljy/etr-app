@@ -7,6 +7,9 @@
     "test": "hardhat test",
     "compile": "hardhat compile",
     "deploy": "hardhat run scripts/deploy.js",
+    "deploy-v2": "hardhat run scripts/deploy-v2.js",
+    "deploy-v2:testnet": "hardhat run scripts/deploy-v2.js --network bscTestnet",
+    "deploy-v2:mainnet": "hardhat run scripts/deploy-v2.js --network bscMainnet",
     "coverage": "hardhat coverage"
   },
   "keywords": [

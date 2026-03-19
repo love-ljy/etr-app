@@ -1,0 +1,124 @@
+{
+  "summary": {
+    "total": 13,
+    "passed": 0,
+    "failed": 13,
+    "passRate": "0.0%"
+  },
+  "deploymentInfo": {
+    "network": "bscTestnet",
+    "chainId": 97,
+    "deployer": "0x4343d520a0e6182d22ec0c0134508571e782a0AB",
+    "timestamp": "2026-03-19T11:29:18.756Z",
+    "contracts": {
+      "ETRToken": "0xaC6557be96B7f661Ab60438bc42194Cd50188Ab8",
+      "StakingPoolV2": "0x3795ddAfD4E651eD67593490Bfc0037Ae2be34d8",
+      "CompoundPoolV2": "0xE6F3eC98d05bBe327Fa046fBB6460cE5bDd93e8e",
+      "ReferralSystem": "0xFC67f6AC14f131a92ee2F03D96292c9DeC224433",
+      "USDT": "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd"
+    },
+    "config": {
+      "etrPriceUSD": "0.25",
+      "lockPeriodDays": 50,
+      "dailyYieldRate": "0.45%"
+    }
+  },
+  "testResults": {
+    "passed": [],
+    "failed": [
+      {
+        "testId": "TC-020",
+        "name": "代币分配验证",
+        "status": "FAIL",
+        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"getTotalSupply\", \"signature\": \"getTotalSupply()\" }, code=BAD_DATA, version=6.16.0)",
+        "timestamp": "2026-03-19T11:41:21.293Z"
+      },
+      {
+        "testId": "TC-021",
+        "name": "代币基本信息",
+        "status": "FAIL",
+        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"name\", \"signature\": \"name()\" }, code=BAD_DATA, version=6.16.0)",
+        "timestamp": "2026-03-19T11:41:21.293Z"
+      },
+      {
+        "testId": "TC-001",
+        "name": "质押配置验证",
+        "status": "FAIL",
+        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"config\", \"signature\": \"config()\" }, code=BAD_DATA, version=6.16.0)",
+        "timestamp": "2026-03-19T11:41:21.294Z"
+      },
+      {
+        "testId": "TC-006",
+        "name": "奖励池验证",
+        "status": "FAIL",
+        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"getRewardPoolBalance\", \"signature\": \"getRewardPoolBalance()\" }, code=BAD_DATA, version=6.16.0)",
+        "timestamp": "2026-03-19T11:41:21.297Z"
+      },
+      {
+        "testId": "TC-007",
+        "name": "ETR 价格配置",
+        "status": "FAIL",
+        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"etrPriceUSD\", \"signature\": \"etrPriceUSD()\" }, code=BAD_DATA, version=6.16.0)",
+        "timestamp": "2026-03-19T11:41:21.298Z"
+      },
+      {
+        "testId": "TC-010",
+        "name": "复利池配置验证",
+        "status": "FAIL",
+        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"currentYieldRate\", \"signature\": \"currentYieldRate()\" }, code=BAD_DATA, version=6.16.0)",
+        "timestamp": "2026-03-19T11:41:21.298Z"
+      },
+      {
+        "testId": "TC-011",
+        "name": "复利开关初始状态",
+        "status": "FAIL",
+        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"allowDirectDeposit\", \"signature\": \"allowDirectDeposit()\" }, code=BAD_DATA, version=6.16.0)",
+        "timestamp": "2026-03-19T11:41:21.299Z"
+      },
+      {
+        "testId": "TC-015",
+        "name": "管理员切换开关",
+        "status": "FAIL",
+        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"allowDirectDeposit\", \"signature\": \"allowDirectDeposit()\" }, code=BAD_DATA, version=6.16.0)",
+        "timestamp": "2026-03-19T11:41:21.302Z"
+      },
+      {
+        "testId": "TC-030",
+        "name": "推荐系统配置",
+        "status": "FAIL",
+        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"stakingPool\", \"signature\": \"stakingPool()\" }, code=BAD_DATA, version=6.16.0)",
+        "timestamp": "2026-03-19T11:41:21.303Z"
+      },
+      {
+        "testId": "TC-031",
+        "name": "推荐比例验证",
+        "status": "FAIL",
+        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"config\", \"signature\": \"config()\" }, code=BAD_DATA, version=6.16.0)",
+        "timestamp": "2026-03-19T11:41:21.304Z"
+      },
+      {
+        "testId": "TC-040",
+        "name": "StakingPool→CompoundPool",
+        "status": "FAIL",
+        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"compoundPool\", \"signature\": \"compoundPool()\" }, code=BAD_DATA, version=6.16.0)",
+        "timestamp": "2026-03-19T11:41:21.304Z"
+      },
+      {
+        "testId": "TC-041",
+        "name": "StakingPool→ReferralSystem",
+        "status": "FAIL",
+        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"referralSystem\", \"signature\": \"referralSystem()\" }, code=BAD_DATA, version=6.16.0)",
+        "timestamp": "2026-03-19T11:41:21.304Z"
+      },
+      {
+        "testId": "TC-042",
+        "name": "CompoundPool→StakingPool",
+        "status": "FAIL",
+        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"stakingPool\", \"signature\": \"stakingPool()\" }, code=BAD_DATA, version=6.16.0)",
+        "timestamp": "2026-03-19T11:41:21.305Z"
+      }
+    ],
+    "skipped": []
+  },
+  "timestamp": "2026-03-19T11:41:21.305Z"
+}
