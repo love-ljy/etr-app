@@ -38,8 +38,8 @@ export const ETR_DECIMALS = 18;
 // USDT 合约地址 (BSC 主网)
 export const USDT_ADDRESS = '0x55d398326f99059fF775485246999027B3197955';
 
-// USDT 合约地址 (BSC 测试网) - MockUSDT
-export const USDT_ADDRESS_TESTNET = '0xEB4a0196124797a7580d2A260EBFF0bd845dc956';
+// USDT 合约地址 (BSC 测试网)
+export const USDT_ADDRESS_TESTNET = '0x337610d27c682E347C9cD60BD4b3b107C9d34dDd';
 
 // 获取当前链的合约地址
 export const getContractAddresses = (chain: keyof typeof CONTRACT_ADDRESSES = DEFAULT_CHAIN) => {

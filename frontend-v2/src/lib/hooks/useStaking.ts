@@ -307,7 +307,7 @@ export function useStaking() {
   }, [writeApprove, usdtAddress]);
 
   // 质押 USDT (V2 版本：质押 USDT 赚取 ETR)
-  const stakeUSDT = useCallback(async (amount: string, referrer: string = '0x0000000000000000000000000000000000000000') => {
+  const stakeUSDT = useCallback(async (amount: string) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -318,7 +318,7 @@ export function useStaking() {
         address: ADDRESSES.StakingPool as `0x${string}`,
         abi: StakingPoolABI,
         functionName: 'stake',
-        args: [amountBigInt, referrer],
+        args: [amountBigInt] as const,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : '质押失败');
