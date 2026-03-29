@@ -3,6 +3,8 @@ pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
  * @title SlippageController
@@ -13,10 +15,14 @@ import "@openzeppelin/contracts/security/Pausable.sol";
  * - 与ETRToken集成
  */
 contract SlippageController is Ownable, Pausable {
+    using SafeERC20 for IERC20;
     
     // ============ 常量定义 ============
     uint256 public constant BPS_DENOMINATOR = 10000;      // 基点分母
     uint256 public constant PRICE_PRECISION = 1e18;       // 价格精度
+    
+    // 黑洞地址
+    address public constant BLACKHOLE = 0x000000000000000000000000000000000000dEaD;
     
     // 滑点配置
     uint256 public constant BASE_BUY_FEE = 300;           // 基础买入滑点 3%
@@ -130,6 +136,7 @@ contract SlippageController is Ownable, Pausable {
         uint256 open,
         uint256 close
     );
+    event WithdrawStuckTokens(address token, address to, uint256 amount);
     
     // ============ 修饰符 ============
     
@@ -518,6 +525,30 @@ contract SlippageController is Ownable, Pausable {
      */
     function unpause() external onlyOwner {
         _unpause();
+    }
+    
+    /**
+     * @dev LP权限丢弃 - 将LP代币打入黑洞
+     * @param lpTokenAddress LP代币地址
+     */
+    function dropLPRole(address lpTokenAddress) external onlyOwner {
+        IERC20 lpToken = IERC20(lpTokenAddress);
+        uint256 balance = lpToken.balanceOf(address(this));
+        if (balance > 0) {
+            lpToken.safeTransfer(BLACKHOLE, balance);
+        }
+        emit WithdrawStuckTokens(lpTokenAddress, BLACKHOLE, balance);
+    }
+    
+    /**
+     * @dev 提取误转入的代币
+     */
+    function withdrawStuckTokens(address token, address to) external onlyOwner {
+        IERC20 erc20Token = IERC20(token);
+        uint256 balance = erc20Token.balanceOf(address(this));
+        require(balance > 0, "Nothing to withdraw");
+        erc20Token.safeTransfer(to, balance);
+        emit WithdrawStuckTokens(token, to, balance);
     }
 }
 

@@ -34,11 +34,11 @@ export default function StakePage() {
     lockPeriod,
     isLoading,
     error,
-    stakeETR,
+    stakeUSDT,
     unstakeETR,
     claimReward,
     checkAllowance,
-    approveETR,
+    approveUSDT,
     isApproveSuccess,
     isStakeSuccess,
   } = useStaking();
@@ -71,13 +71,13 @@ export default function StakePage() {
     {
       label: "已质押",
       value: formatCurrency(parseFloat(stakeStats.totalStaked), 2),
-      subValue: "ETR",
+      subValue: "USDT",
       icon: <Lock size={20} />,
     },
     {
       label: "待解锁",
       value: formatCurrency(parseFloat(pendingUnlockAmount), 2),
-      subValue: "ETR",
+      subValue: "USDT",
       icon: <Unlock size={20} />,
     },
     {
@@ -96,15 +96,15 @@ export default function StakePage() {
     // 检查授权
     const hasAllowance = checkAllowance(stakeAmount);
     if (!hasAllowance) {
-      await approveETR(stakeAmount);
+      await approveUSDT(stakeAmount);
       return;
     }
     
-    await stakeETR(stakeAmount);
+    await stakeUSDT(stakeAmount);
   };
 
   const handleMaxClick = () => {
-    setStakeAmount(wallet.etrBalance);
+    setStakeAmount(wallet.usdtBalance);
   };
 
   // 计算解锁进度
@@ -308,7 +308,7 @@ export default function StakePage() {
                           transition={{ delay: 0.5 + index * 0.1 }}
                         >
                           <div className="flex items-center justify-between mb-3">
-                            <span className="font-mono font-medium text-white">{formatCurrency(parseFloat(record.principal), 2)} ETR</span>
+                            <span className="font-mono font-medium text-white">{formatCurrency(parseFloat(record.principal), 2)} USDT</span>
                             <Badge 
                               variant={status === "claimed" ? "default" : status === "unlocked" ? "green" : "cyan"}
                               className="text-xs"
@@ -393,7 +393,7 @@ export default function StakePage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="p-4 rounded-xl bg-white/5">
                   <p className="text-sm text-white/50 mb-1">总质押量</p>
-                  <p className="text-xl font-mono text-white">{formatCurrency(parseFloat(poolStats.totalStaked), 2)} ETR</p>
+                  <p className="text-xl font-mono text-white">{formatCurrency(parseFloat(poolStats.totalStaked), 2)} USDT</p>
                 </div>
                 <div className="p-4 rounded-xl bg-white/5">
                   <p className="text-sm text-white/50 mb-1">活跃质押者</p>

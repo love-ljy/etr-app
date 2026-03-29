@@ -51,7 +51,7 @@ export function useReferral() {
     functionName: 'getReferralStats',
     args: address ? [address] : undefined,
     query: {
-      enabled: !!address && isConnected && ADDRESSES.ReferralSystem !== '0x...',
+      enabled: !!address && isConnected && !!ADDRESSES.ReferralSystem,
     },
   });
 
@@ -62,7 +62,7 @@ export function useReferral() {
     functionName: 'getReferralCode',
     args: address ? [address] : undefined,
     query: {
-      enabled: !!address && isConnected && ADDRESSES.ReferralSystem !== '0x...',
+      enabled: !!address && isConnected && !!ADDRESSES.ReferralSystem,
     },
   });
 
@@ -73,7 +73,7 @@ export function useReferral() {
     functionName: 'getReferrer',
     args: address ? [address] : undefined,
     query: {
-      enabled: !!address && isConnected && ADDRESSES.ReferralSystem !== '0x...',
+      enabled: !!address && isConnected && !!ADDRESSES.ReferralSystem,
     },
   });
 
@@ -84,7 +84,7 @@ export function useReferral() {
     functionName: 'hasReferrer',
     args: address ? [address] : undefined,
     query: {
-      enabled: !!address && isConnected && ADDRESSES.ReferralSystem !== '0x...',
+      enabled: !!address && isConnected && !!ADDRESSES.ReferralSystem,
     },
   });
 
@@ -94,7 +94,7 @@ export function useReferral() {
     abi: ReferralSystemABI,
     functionName: 'DIRECT_REWARD_RATE',
     query: {
-      enabled: isConnected && ADDRESSES.ReferralSystem !== '0x...',
+      enabled: isConnected && !!ADDRESSES.ReferralSystem,
     },
   });
 
@@ -103,7 +103,7 @@ export function useReferral() {
     abi: ReferralSystemABI,
     functionName: 'INDIRECT_REWARD_RATE',
     query: {
-      enabled: isConnected && ADDRESSES.ReferralSystem !== '0x...',
+      enabled: isConnected && !!ADDRESSES.ReferralSystem,
     },
   });
 
@@ -112,7 +112,7 @@ export function useReferral() {
     abi: ReferralSystemABI,
     functionName: 'DEEP_REWARD_RATE',
     query: {
-      enabled: isConnected && ADDRESSES.ReferralSystem !== '0x...',
+      enabled: isConnected && !!ADDRESSES.ReferralSystem,
     },
   });
 

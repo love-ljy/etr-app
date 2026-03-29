@@ -8,6 +8,13 @@ const path = require("path");
 
 const testResults = { passed: [], failed: [], skipped: [] };
 
+// 加载合约 ABI
+function loadABI(contractName) {
+  const abiPath = path.join(__dirname, "artifacts/contracts", `${contractName}.sol`, `${contractName}.json`);
+  const artifact = JSON.parse(fs.readFileSync(abiPath, "utf8"));
+  return artifact.abi;
+}
+
 function logTest(testId, name, status, details = '') {
   const result = { testId, name, status, details, timestamp: new Date().toISOString() };
   if (status === 'PASS') testResults.passed.push(result);
@@ -24,8 +31,25 @@ async function runTests() {
   console.log("=".repeat(70));
   console.log();
   
+  // 强制连接到 BSC Testnet
+  const provider = new ethers.JsonRpcProvider("https://data-seed-prebsc-1-s1.binance.org:8545");
+  const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+  console.log("测试账户:", wallet.address);
+  console.log("网络：BSC Testnet (ChainId: 97)");
+  console.log();
+  
+  // 验证网络连接
+  try {
+    const network = await provider.getNetwork();
+    console.log("已连接到网络，ChainId:", Number(network.chainId));
+    console.log("账户余额:", ethers.formatEther(await provider.getBalance(wallet.address)), "BNB");
+  } catch (error) {
+    console.error("⚠️ 网络连接失败:", error.message);
+    console.log("继续尝试执行测试...\n");
+  }
+  
   const [deployer] = await ethers.getSigners();
-  console.log("测试账户:", deployer.address);
+  console.log("Hardhat 默认账户:", deployer.address);
   
   const deploymentInfo = require("./deployment-v2.json");
   const contracts = deploymentInfo.contracts;
@@ -39,10 +63,11 @@ async function runTests() {
   console.log("  ReferralSystem:", contracts.ReferralSystem);
   console.log();
   
-  const ETRToken = await ethers.getContractAt("ETRToken", contracts.ETRToken);
-  const StakingPoolV2 = await ethers.getContractAt("StakingPoolV2", contracts.StakingPoolV2);
-  const CompoundPoolV2 = await ethers.getContractAt("CompoundPoolV2", contracts.CompoundPoolV2);
-  const ReferralSystem = await ethers.getContractAt("ReferralSystem", contracts.ReferralSystem);
+  // 使用加载的 ABI 创建合约实例
+  const ETRToken = new ethers.Contract(contracts.ETRToken, loadABI("ETRToken"), wallet);
+  const StakingPoolV2 = new ethers.Contract(contracts.StakingPoolV2, loadABI("StakingPoolV2"), wallet);
+  const CompoundPoolV2 = new ethers.Contract(contracts.CompoundPoolV2, loadABI("CompoundPoolV2"), wallet);
+  const ReferralSystem = new ethers.Contract(contracts.ReferralSystem, loadABI("ReferralSystem"), wallet);
   
   console.log("=".repeat(70));
   console.log("开始执行测试用例");

@@ -37,6 +37,9 @@ contract DividendPool is Ownable, Pausable, ReentrancyGuard {
     uint256 public constant V2_SHARE_PERCENT = 3000;      // V2分红比例 30%
     uint256 public constant V3_SHARE_PERCENT = 2000;      // V3分红比例 20%
     
+    // 小区业绩计算深度配置
+    uint256 public constant DEFAULT_TEAM_DEPTH = 10;  // 默认10层
+    
     // ============ 枚举定义 ============
     
     enum DividendLevel { None, V1, V2, V3 }
@@ -78,6 +81,9 @@ contract DividendPool is Ownable, Pausable, ReentrancyGuard {
     
     // 用户分红信息
     mapping(address => UserDividendInfo) public userInfos;
+    
+    // 小区业绩计算深度限制
+    uint256 public teamDepthLimit = DEFAULT_TEAM_DEPTH;
     
     // 等级统计
     mapping(DividendLevel => LevelStats) public levelStats;
@@ -132,6 +138,7 @@ contract DividendPool is Ownable, Pausable, ReentrancyGuard {
         DividendLevel level,
         uint256 smallZonePerformance
     );
+    event TeamDepthLimitUpdated(uint256 oldLimit, uint256 newLimit);
     
     // ============ 修饰符 ============
     
@@ -312,7 +319,7 @@ contract DividendPool is Ownable, Pausable, ReentrancyGuard {
         
         for (uint256 i = 0; i < directReferrals.length; i++) {
             // 计算每个直推团队的业绩
-            uint256 teamPerformance = _calculateTeamPerformance(directReferrals[i]);
+            uint256 teamPerformance = _calculateTeamPerformanceSimple(directReferrals[i]);
             teamTotal += teamPerformance;
             
             if (teamPerformance > maxTeam) {
@@ -334,17 +341,33 @@ contract DividendPool is Ownable, Pausable, ReentrancyGuard {
     }
     
     /**
-     * @dev 计算某个团队的总业绩（递归计算）
+     * @dev 计算某个团队的总业绩（递归计算，限制深度）
+     * @param user 用户地址
+     * @param depth 当前递归深度
+     * @param maxDepth 最大递归深度（由teamDepthLimit控制）
      */
-    function _calculateTeamPerformance(address user) internal view returns (uint256) {
+    function _calculateTeamPerformance(address user, uint256 depth, uint256 maxDepth) 
+        internal 
+        view 
+        returns (uint256) 
+    {
+        if (depth >= maxDepth) return 0; // 达到深度限制，返回0
+        
         uint256 total = _getUserStakeValue(user);
         
         address[] memory directs = _getDirectReferrals(user);
         for (uint256 i = 0; i < directs.length; i++) {
-            total += _calculateTeamPerformance(directs[i]);
+            total += _calculateTeamPerformance(directs[i], depth + 1, maxDepth);
         }
         
         return total;
+    }
+    
+    /**
+     * @dev 计算某个团队的总业绩（对外接口，使用默认深度）
+     */
+    function _calculateTeamPerformanceSimple(address user) internal view returns (uint256) {
+        return _calculateTeamPerformance(user, 0, teamDepthLimit);
     }
     
     /**
@@ -556,6 +579,26 @@ contract DividendPool is Ownable, Pausable, ReentrancyGuard {
      */
     function unpause() external onlyOwner {
         _unpause();
+    }
+    
+    /**
+     * @dev 设置小区业绩计算深度限制
+     * @param depth 深度层数（默认10层）
+     */
+    function setTeamDepthLimit(uint256 depth) external onlyOwner {
+        require(depth >= 1 && depth <= 20, "Depth out of range (1-20)");
+        
+        uint256 oldLimit = teamDepthLimit;
+        teamDepthLimit = depth;
+        
+        emit TeamDepthLimitUpdated(oldLimit, depth);
+    }
+    
+    /**
+     * @dev 获取当前小区业绩计算深度
+     */
+    function getTeamDepthLimit() external view returns (uint256) {
+        return teamDepthLimit;
     }
 }
 

@@ -59,7 +59,7 @@ export function useCompound() {
     functionName: 'getCompoundInfo',
     args: address ? [address] : undefined,
     query: {
-      enabled: !!address && isConnected && ADDRESSES.CompoundPool !== '0x...',
+      enabled: !!address && isConnected && !!ADDRESSES.CompoundPool,
     },
   });
 
@@ -70,7 +70,7 @@ export function useCompound() {
     functionName: 'getCompoundBalance',
     args: address ? [address] : undefined,
     query: {
-      enabled: !!address && isConnected && ADDRESSES.CompoundPool !== '0x...',
+      enabled: !!address && isConnected && !!ADDRESSES.CompoundPool,
     },
   });
 
@@ -81,7 +81,7 @@ export function useCompound() {
     functionName: 'totalDeposited',
     args: address ? [address] : undefined,
     query: {
-      enabled: !!address && isConnected && ADDRESSES.CompoundPool !== '0x...',
+      enabled: !!address && isConnected && !!ADDRESSES.CompoundPool,
     },
   });
 
@@ -92,7 +92,7 @@ export function useCompound() {
     functionName: 'totalClaimed',
     args: address ? [address] : undefined,
     query: {
-      enabled: !!address && isConnected && ADDRESSES.CompoundPool !== '0x...',
+      enabled: !!address && isConnected && !!ADDRESSES.CompoundPool,
     },
   });
 
@@ -103,7 +103,7 @@ export function useCompound() {
     functionName: 'totalTransferred',
     args: address ? [address] : undefined,
     query: {
-      enabled: !!address && isConnected && ADDRESSES.CompoundPool !== '0x...',
+      enabled: !!address && isConnected && !!ADDRESSES.CompoundPool,
     },
   });
 
@@ -113,7 +113,7 @@ export function useCompound() {
     abi: CompoundPoolABI,
     functionName: 'currentYieldRate',
     query: {
-      enabled: isConnected && ADDRESSES.CompoundPool !== '0x...',
+      enabled: isConnected && !!ADDRESSES.CompoundPool,
     },
   });
 
@@ -124,7 +124,7 @@ export function useCompound() {
     functionName: 'calculateDailyCompound',
     args: address ? [address] : undefined,
     query: {
-      enabled: !!address && isConnected && ADDRESSES.CompoundPool !== '0x...',
+      enabled: !!address && isConnected && !!ADDRESSES.CompoundPool,
     },
   });
 

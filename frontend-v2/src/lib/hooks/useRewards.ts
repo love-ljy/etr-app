@@ -73,7 +73,7 @@ export function useRewards() {
     functionName: 'getReferralStats',
     args: address ? [address] : undefined,
     query: {
-      enabled: !!address && isConnected && ADDRESSES.ReferralSystem !== '0x...',
+      enabled: !!address && isConnected && !!ADDRESSES.ReferralSystem,
     },
   });
 
@@ -84,7 +84,7 @@ export function useRewards() {
     functionName: 'getUserDividendInfo',
     args: address ? [address] : undefined,
     query: {
-      enabled: !!address && isConnected && ADDRESSES.DividendPool !== '0x...',
+      enabled: !!address && isConnected && !!ADDRESSES.DividendPool,
     },
   });
 
@@ -94,7 +94,7 @@ export function useRewards() {
     abi: DividendPoolABI,
     functionName: 'getPoolStatus',
     query: {
-      enabled: isConnected && ADDRESSES.DividendPool !== '0x...',
+      enabled: isConnected && !!ADDRESSES.DividendPool,
     },
   });
 

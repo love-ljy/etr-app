@@ -27,7 +27,7 @@ if (!projectId) {
 createAppKit({
   adapters: [wagmiAdapter],
   projectId: finalProjectId,
-  networks,
+  networks: networks as any, // 类型断言解决类型不匹配问题
   metadata,
   themeMode: 'dark', // 深色主题
   themeVariables: {

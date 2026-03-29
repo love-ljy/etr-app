@@ -313,6 +313,128 @@ contract StakingPoolV2 is Ownable, Pausable, ReentrancyGuard {
     }
     
     /**
+     * @dev ETR 直接质押
+     * @param etrAmount ETR 数量
+     * @param referrer 推荐人地址（可选）
+     * @return stakeId 质押记录 ID
+     */
+    function stakeETR(uint256 etrAmount, address referrer) 
+        external 
+        whenNotPaused 
+        nonReentrant 
+        returns (uint256) 
+    {
+        require(etrAmount > 0, "StakingPoolV2: amount must be > 0");
+        
+        // 1. 从用户转入 ETR
+        etrToken.safeTransferFrom(msg.sender, address(this), etrAmount);
+        
+        // 2. 计算质押价值 USD（用于有效账户判断和业绩统计）
+        uint256 stakeValueUSD = etrAmount * etrPriceUSD / 1e18;
+        
+        // 3. 创建质押记录
+        uint256 stakeId = nextStakeId++;
+        uint256 unlockTime = block.timestamp + config.lockPeriod;
+        
+        stakes[stakeId] = StakeRecord({
+            stakeId: stakeId,
+            owner: msg.sender,
+            stakedUSDT: stakeValueUSD,      // USDT价值作为质押量
+            principal: etrAmount,            // ETR本金用于计算解锁
+            originalPrincipal: etrAmount,
+            startTime: block.timestamp,
+            unlockTime: unlockTime,
+            lastClaimTime: block.timestamp,
+            totalClaimed: 0,
+            dailyYieldRate: currentYieldRate,
+            active: true
+        });
+        
+        // 4. 更新用户账户
+        UserAccount storage account = userAccounts[msg.sender];
+        account.stakeIds.push(stakeId);
+        account.totalStakedUSDT += stakeValueUSD;
+        
+        // 5. 更新全局统计
+        totalStakedUSDT += stakeValueUSD;
+        
+        // 6. 更新账户有效性
+        _updateAccountValidity(msg.sender);
+        
+        // 7. 绑定推荐关系
+        if (account.stakeIds.length == 1 && referrer != address(0) && referralSystem != address(0)) {
+            _bindReferrer(msg.sender, referrer);
+        }
+        
+        emit Staked(msg.sender, stakeId, stakeValueUSD, etrAmount, unlockTime, block.timestamp);
+        
+        return stakeId;
+    }
+    
+    /**
+     * @dev 批量质押 ETR（合并多次质押）
+     * @param etrAmounts ETR 数量数组
+     * @param referrer 推荐人地址
+     * @return stakeIds 质押记录 ID 数组
+     */
+    function stakeETRBatch(uint256[] calldata etrAmounts, address referrer) 
+        external 
+        whenNotPaused 
+        nonReentrant 
+        returns (uint256[] memory) 
+    {
+        require(etrAmounts.length > 0 && etrAmounts.length <= 10, "StakingPoolV2: batch size invalid");
+        
+        uint256[] memory stakeIds = new uint256[](etrAmounts.length);
+        
+        for (uint256 i = 0; i < etrAmounts.length; i++) {
+            require(etrAmounts[i] > 0, "StakingPoolV2: amount must be > 0");
+            
+            // 转入 ETR
+            etrToken.safeTransferFrom(msg.sender, address(this), etrAmounts[i]);
+            
+            // 计算质押价值
+            uint256 stakeValueUSD = etrAmounts[i] * etrPriceUSD / 1e18;
+            
+            // 创建质押记录
+            uint256 stakeId = nextStakeId++;
+            uint256 unlockTime = block.timestamp + config.lockPeriod;
+            
+            stakes[stakeId] = StakeRecord({
+                stakeId: stakeId,
+                owner: msg.sender,
+                stakedUSDT: stakeValueUSD,
+                principal: etrAmounts[i],
+                originalPrincipal: etrAmounts[i],
+                startTime: block.timestamp,
+                unlockTime: unlockTime,
+                lastClaimTime: block.timestamp,
+                totalClaimed: 0,
+                dailyYieldRate: currentYieldRate,
+                active: true
+            });
+            
+            stakeIds[i] = stakeId;
+            
+            // 更新账户
+            UserAccount storage account = userAccounts[msg.sender];
+            account.stakeIds.push(stakeId);
+            account.totalStakedUSDT += stakeValueUSD;
+            totalStakedUSDT += stakeValueUSD;
+        }
+        
+        // 更新有效性
+        _updateAccountValidity(msg.sender);
+        
+        // 绑定推荐人（只在第一次质押时）
+        if (userAccounts[msg.sender].stakeIds.length == etrAmounts.length && referrer != address(0) && referralSystem != address(0)) {
+            _bindReferrer(msg.sender, referrer);
+        }
+        
+        return stakeIds;
+    }
+    
+    /**
      * @dev 解押 USDT（只能解押已解锁部分）
      * @param stakeId 质押记录 ID
      * @return usdtAmount 解押 USDT 数量

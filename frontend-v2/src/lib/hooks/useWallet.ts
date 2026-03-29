@@ -59,7 +59,7 @@ export function useWallet() {
     functionName: 'balanceOf',
     args: address ? [address] : undefined,
     query: {
-      enabled: isConnected && !!address && contracts.ETRToken !== '0x...',
+      enabled: isConnected && !!address && !!contracts.ETRToken,
     },
   });
 

@@ -1,9 +1,9 @@
 {
   "summary": {
     "total": 13,
-    "passed": 0,
-    "failed": 13,
-    "passRate": "0.0%"
+    "passed": 13,
+    "failed": 0,
+    "passRate": "100.0%"
   },
   "deploymentInfo": {
     "network": "bscTestnet",
@@ -24,101 +24,101 @@
     }
   },
   "testResults": {
-    "passed": [],
-    "failed": [
+    "passed": [
       {
         "testId": "TC-020",
         "name": "代币分配验证",
-        "status": "FAIL",
-        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"getTotalSupply\", \"signature\": \"getTotalSupply()\" }, code=BAD_DATA, version=6.16.0)",
-        "timestamp": "2026-03-19T11:41:21.293Z"
+        "status": "PASS",
+        "details": "总供应=200000000.0 ETR",
+        "timestamp": "2026-03-20T03:29:20.077Z"
       },
       {
         "testId": "TC-021",
         "name": "代币基本信息",
-        "status": "FAIL",
-        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"name\", \"signature\": \"name()\" }, code=BAD_DATA, version=6.16.0)",
-        "timestamp": "2026-03-19T11:41:21.293Z"
+        "status": "PASS",
+        "details": "Equator ETR (ETR)",
+        "timestamp": "2026-03-20T03:29:20.352Z"
       },
       {
         "testId": "TC-001",
         "name": "质押配置验证",
-        "status": "FAIL",
-        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"config\", \"signature\": \"config()\" }, code=BAD_DATA, version=6.16.0)",
-        "timestamp": "2026-03-19T11:41:21.294Z"
+        "status": "PASS",
+        "details": "锁仓50天",
+        "timestamp": "2026-03-20T03:29:20.442Z"
       },
       {
         "testId": "TC-006",
         "name": "奖励池验证",
-        "status": "FAIL",
-        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"getRewardPoolBalance\", \"signature\": \"getRewardPoolBalance()\" }, code=BAD_DATA, version=6.16.0)",
-        "timestamp": "2026-03-19T11:41:21.297Z"
+        "status": "PASS",
+        "details": "余额=100000.0 ETR",
+        "timestamp": "2026-03-20T03:29:20.621Z"
       },
       {
         "testId": "TC-007",
         "name": "ETR 价格配置",
-        "status": "FAIL",
-        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"etrPriceUSD\", \"signature\": \"etrPriceUSD()\" }, code=BAD_DATA, version=6.16.0)",
-        "timestamp": "2026-03-19T11:41:21.298Z"
+        "status": "PASS",
+        "details": "$0.25",
+        "timestamp": "2026-03-20T03:29:20.711Z"
       },
       {
         "testId": "TC-010",
         "name": "复利池配置验证",
-        "status": "FAIL",
-        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"currentYieldRate\", \"signature\": \"currentYieldRate()\" }, code=BAD_DATA, version=6.16.0)",
-        "timestamp": "2026-03-19T11:41:21.298Z"
+        "status": "PASS",
+        "details": "日化0.45%",
+        "timestamp": "2026-03-20T03:29:20.898Z"
       },
       {
         "testId": "TC-011",
         "name": "复利开关初始状态",
-        "status": "FAIL",
-        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"allowDirectDeposit\", \"signature\": \"allowDirectDeposit()\" }, code=BAD_DATA, version=6.16.0)",
-        "timestamp": "2026-03-19T11:41:21.299Z"
+        "status": "PASS",
+        "details": "关闭",
+        "timestamp": "2026-03-20T03:29:20.990Z"
       },
       {
         "testId": "TC-015",
         "name": "管理员切换开关",
-        "status": "FAIL",
-        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"allowDirectDeposit\", \"signature\": \"allowDirectDeposit()\" }, code=BAD_DATA, version=6.16.0)",
-        "timestamp": "2026-03-19T11:41:21.302Z"
+        "status": "PASS",
+        "details": "开启→关闭切换成功",
+        "timestamp": "2026-03-20T03:29:30.796Z"
       },
       {
         "testId": "TC-030",
         "name": "推荐系统配置",
-        "status": "FAIL",
-        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"stakingPool\", \"signature\": \"stakingPool()\" }, code=BAD_DATA, version=6.16.0)",
-        "timestamp": "2026-03-19T11:41:21.303Z"
+        "status": "PASS",
+        "details": "StakingPool 已关联",
+        "timestamp": "2026-03-20T03:29:30.884Z"
       },
       {
         "testId": "TC-031",
         "name": "推荐比例验证",
-        "status": "FAIL",
-        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"config\", \"signature\": \"config()\" }, code=BAD_DATA, version=6.16.0)",
-        "timestamp": "2026-03-19T11:41:21.304Z"
+        "status": "PASS",
+        "details": "3%/2%/1%",
+        "timestamp": "2026-03-20T03:29:30.974Z"
       },
       {
         "testId": "TC-040",
         "name": "StakingPool→CompoundPool",
-        "status": "FAIL",
-        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"compoundPool\", \"signature\": \"compoundPool()\" }, code=BAD_DATA, version=6.16.0)",
-        "timestamp": "2026-03-19T11:41:21.304Z"
+        "status": "PASS",
+        "details": "关联正确",
+        "timestamp": "2026-03-20T03:29:31.065Z"
       },
       {
         "testId": "TC-041",
         "name": "StakingPool→ReferralSystem",
-        "status": "FAIL",
-        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"referralSystem\", \"signature\": \"referralSystem()\" }, code=BAD_DATA, version=6.16.0)",
-        "timestamp": "2026-03-19T11:41:21.304Z"
+        "status": "PASS",
+        "details": "关联正确",
+        "timestamp": "2026-03-20T03:29:31.154Z"
       },
       {
         "testId": "TC-042",
         "name": "CompoundPool→StakingPool",
-        "status": "FAIL",
-        "details": "could not decode result data (value=\"0x\", info={ \"method\": \"stakingPool\", \"signature\": \"stakingPool()\" }, code=BAD_DATA, version=6.16.0)",
-        "timestamp": "2026-03-19T11:41:21.305Z"
+        "status": "PASS",
+        "details": "关联正确",
+        "timestamp": "2026-03-20T03:29:31.244Z"
       }
     ],
+    "failed": [],
     "skipped": []
   },
-  "timestamp": "2026-03-19T11:41:21.305Z"
+  "timestamp": "2026-03-20T03:29:31.245Z"
 }

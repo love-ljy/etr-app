@@ -8,30 +8,54 @@ import {
   useWaitForTransactionReceipt 
 } from 'wagmi';
 import { parseUnits, formatUnits } from 'viem';
-import { StakingPoolABI, ETRTokenABI } from '@/lib/abis';
-import { getContractAddresses } from '@/lib/web3/contracts';
+import { StakingPoolABI } from '@/lib/abis';
+import { getContractAddresses, USDT_ADDRESS_TESTNET } from '@/lib/web3/contracts';
 
 const ADDRESSES = getContractAddresses();
+
+// USDT ABI (ERC20)
+const USDT_ABI = [
+  {
+    inputs: [
+      { internalType: 'address', name: 'owner', type: 'address' },
+      { internalType: 'address', name: 'spender', type: 'address' },
+    ],
+    name: 'allowance',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'spender', type: 'address' },
+      { internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+] as const;
 
 // 质押记录接口
 export interface StakeRecord {
   id: number;
-  principal: string;          // 当前本金
-  originalPrincipal: string;  // 原始本金
+  principal: string;          // 当前本金 (USDT)
+  originalPrincipal: string;  // 原始本金 (USDT)
   startTime: Date;
   unlockTime: Date;
   lastClaimTime: Date;
-  totalClaimed: string;
+  totalClaimed: string;       // 累计收益 (ETR)
   dailyYieldRate: number;     // 日化收益率 (基点)
   active: boolean;
-  pendingReward: string;      // 待领取收益
+  pendingReward: string;      // 待领取收益 (ETR)
 }
 
 // 用户质押统计
 export interface StakeStats {
-  totalStaked: string;
+  totalStaked: string;        // 已质押 USDT
   totalStakedUSD: string;
-  totalClaimed: string;
+  totalClaimed: string;       // 累计收益 ETR
   totalClaimedUSD: string;
   isValid: boolean;
   portfolioValue: string;
@@ -40,8 +64,8 @@ export interface StakeStats {
 
 // 池子统计
 export interface PoolStats {
-  totalStaked: string;
-  totalRewardsDistributed: string;
+  totalStaked: string;        // 总质押 USDT
+  totalRewardsDistributed: string;  // 已分发 ETR
   activeStakers: number;
   currentYieldRate: number;
 }
@@ -104,10 +128,11 @@ export function useStaking() {
     query: { enabled: isConnected },
   });
 
-  // ETR授权额度
+  // USDT 授权额度 (V2 版本使用 USDT 质押)
+  const usdtAddress = USDT_ADDRESS_TESTNET;
   const { data: allowanceData, refetch: refetchAllowance } = useReadContract({
-    address: ADDRESSES.ETRToken as `0x${string}`,
-    abi: ETRTokenABI,
+    address: usdtAddress as `0x${string}`,
+    abi: USDT_ABI,
     functionName: 'allowance',
     args: address && ADDRESSES.StakingPool ? [address, ADDRESSES.StakingPool as `0x${string}`] : undefined,
     query: { enabled: !!address && isConnected },
@@ -139,7 +164,7 @@ export function useStaking() {
     hash: claimAllHash,
   });
 
-  // 授权ETR
+  // 授权 USDT
   const { writeContract: writeApprove, data: approveHash, error: approveError } = useWriteContract();
   const { isLoading: isApprovePending, isSuccess: isApproveSuccess } = useWaitForTransactionReceipt({
     hash: approveHash,
@@ -192,15 +217,18 @@ export function useStaking() {
 
   // 锁仓周期（秒）
   const lockPeriod = useMemo(() => {
-    if (!configData) return 50 * 24 * 3600; // 默认50天
+    if (!configData) return 50 * 24 * 3600; // 默认 50 天
     return Number((configData as unknown as [bigint, bigint, bigint, bigint, bigint, bigint])[0]);
   }, [configData]);
 
   // 每日解锁比例（基点）
   const dailyUnlockRate = useMemo(() => {
-    if (!configData) return 200; // 默认2%
+    if (!configData) return 200; // 默认 2%
     return Number((configData as unknown as [bigint, bigint, bigint, bigint, bigint, bigint])[1]);
   }, [configData]);
+
+  // ETR 价格 (固定价格 $0.25)
+  const etrPrice = 0.25;
 
   // 质押记录列表 - 包含待领取收益计算
   const stakeRecords: StakeRecord[] = useMemo(() => {
@@ -258,8 +286,8 @@ export function useStaking() {
     }
   }, [allowanceData]);
 
-  // 授权ETR
-  const approveETR = useCallback(async (amount: string) => {
+  // 授权 USDT
+  const approveUSDT = useCallback(async (amount: string) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -267,19 +295,19 @@ export function useStaking() {
       const amountBigInt = parseUnits(amount, 18);
       
       writeApprove({
-        address: ADDRESSES.ETRToken as `0x${string}`,
-        abi: ETRTokenABI,
+        address: usdtAddress as `0x${string}`,
+        abi: USDT_ABI,
         functionName: 'approve',
         args: [ADDRESSES.StakingPool as `0x${string}`, amountBigInt],
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : '授权失败');
+      setError(err instanceof Error ? err.message : 'USDT 授权失败');
       setIsLoading(false);
     }
-  }, [writeApprove]);
+  }, [writeApprove, usdtAddress]);
 
-  // 质押
-  const stakeETR = useCallback(async (amount: string) => {
+  // 质押 USDT (V2 版本：质押 USDT 赚取 ETR)
+  const stakeUSDT = useCallback(async (amount: string, referrer: string = '0x0000000000000000000000000000000000000000') => {
     try {
       setIsLoading(true);
       setError(null);
@@ -290,7 +318,7 @@ export function useStaking() {
         address: ADDRESSES.StakingPool as `0x${string}`,
         abi: StakingPoolABI,
         functionName: 'stake',
-        args: [amountBigInt],
+        args: [amountBigInt, referrer],
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : '质押失败');
@@ -400,8 +428,8 @@ export function useStaking() {
     error,
     
     // 操作
-    approveETR,
-    stakeETR,
+    approveUSDT,
+    stakeUSDT,
     unstakeETR,
     claimReward,
     claimAllRewards,
