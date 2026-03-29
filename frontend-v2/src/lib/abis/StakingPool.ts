@@ -4,11 +4,33 @@
  */
 export const StakingPoolABI = [
   // ===== 质押相关 =====
-  // 质押ETR
+  // 质押ETR (USDT模式 - 旧)
   {
     inputs: [{ internalType: 'uint256', name: 'amount', type: 'uint256' }],
     name: 'stake',
     outputs: [{ internalType: 'uint256', name: 'stakeId', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  // 质押ETR (直接质押ETR - V3新功能)
+  {
+    inputs: [
+      { internalType: 'uint256', name: 'etrAmount', type: 'uint256' },
+      { internalType: 'address', name: 'referrer', type: 'address' },
+    ],
+    name: 'stakeETR',
+    outputs: [{ internalType: 'uint256', name: 'stakeId', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  // 批量质押ETR
+  {
+    inputs: [
+      { internalType: 'uint256[]', name: 'etrAmounts', type: 'uint256[]' },
+      { internalType: 'address', name: 'referrer', type: 'address' },
+    ],
+    name: 'stakeETRBatch',
+    outputs: [{ internalType: 'uint256[]', name: 'stakeIds', type: 'uint256[]' }],
     stateMutability: 'nonpayable',
     type: 'function',
   },

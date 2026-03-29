@@ -326,6 +326,46 @@ export function useStaking() {
     }
   }, [writeStake]);
 
+  // 质押 ETR (直接质押ETR - V3新功能)
+  const stakeETR = useCallback(async (amount: string, referrer: string = '0x0000000000000000000000000000000000000000') => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const amountBigInt = parseUnits(amount, 18);
+
+      writeStake({
+        address: ADDRESSES.StakingPool as `0x${string}`,
+        abi: StakingPoolABI,
+        functionName: 'stakeETR',
+        args: [amountBigInt, referrer as `0x${string}`],
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'ETR质押失败');
+      setIsLoading(false);
+    }
+  }, [writeStake]);
+
+  // 批量质押 ETR
+  const stakeETRBatch = useCallback(async (amounts: string[], referrer: string = '0x0000000000000000000000000000000000000000') => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const amountsBigInt = amounts.map(a => parseUnits(a, 18));
+
+      writeStake({
+        address: ADDRESSES.StakingPool as `0x${string}`,
+        abi: StakingPoolABI,
+        functionName: 'stakeETRBatch',
+        args: [amountsBigInt, referrer as `0x${string}`],
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '批量质押失败');
+      setIsLoading(false);
+    }
+  }, [writeStake]);
+
   // 解押
   const unstakeETR = useCallback(async (stakeId: number, amount: string) => {
     try {
