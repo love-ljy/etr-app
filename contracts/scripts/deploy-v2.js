@@ -7,7 +7,8 @@ async function main() {
   
   const [deployer] = await ethers.getSigners();
   console.log("\n📝 部署账户:", deployer.address);
-  console.log("💰 账户余额:", ethers.formatEther(await deployer.getBalance()), "BNB");
+  const balance = await ethers.provider.getBalance(deployer.address);
+  console.log("💰 账户余额:", ethers.formatEther(balance), "BNB");
   
   // 获取网络信息
   const network = await ethers.provider.getNetwork();
@@ -77,7 +78,8 @@ async function main() {
   console.log("   地址:", stakingPoolAddress);
   console.log("   USDT 地址:", USDT_ADDRESS);
   console.log("   ETR 价格:", ethers.formatEther(await stakingPool.etrPriceUSD()), "USD");
-  console.log("   锁仓周期:", (await stakingPool.config()).lockPeriod / 86400, "天");
+  const config = await stakingPool.config();
+  console.log("   锁仓周期:", Number(config.lockPeriod) / 86400, "天");
   console.log("   日化收益率:", (await stakingPool.currentYieldRate()).toString(), "基点 (0.45%)");
   
   // ========== 4. 部署 ReferralSystem ==========
@@ -93,6 +95,32 @@ async function main() {
   console.log("✅ ReferralSystem 部署成功!");
   console.log("   地址:", referralSystemAddress);
   
+  // ========== 4.5 部署 DividendPool ==========
+  console.log("\n" + "=".repeat(60));
+  console.log("4️⃣.5  部署 DividendPool...");
+  console.log("=".repeat(60));
+  
+  const DividendPool = await ethers.getContractFactory("DividendPool");
+  const dividendPool = await DividendPool.deploy(etrTokenAddress, stakingPoolAddress, referralSystemAddress);
+  await dividendPool.waitForDeployment();
+  const dividendPoolAddress = await dividendPool.getAddress();
+  
+  console.log("✅ DividendPool 部署成功!");
+  console.log("   地址:", dividendPoolAddress);
+  
+  // ========== 4.6 部署 SlippageController ==========
+  console.log("\n" + "=".repeat(60));
+  console.log("4️⃣.6  部署 SlippageController...");
+  console.log("=".repeat(60));
+  
+  const SlippageController = await ethers.getContractFactory("SlippageController");
+  const slippageController = await SlippageController.deploy(etrTokenAddress, deployer.address, deployer.address);
+  await slippageController.waitForDeployment();
+  const slippageControllerAddress = await slippageController.getAddress();
+  
+  console.log("✅ SlippageController 部署成功!");
+  console.log("   地址:", slippageControllerAddress);
+  
   // ========== 5. 配置合约关联 ==========
   console.log("\n" + "=".repeat(60));
   console.log("5️⃣  配置合约关联...");
@@ -100,8 +128,9 @@ async function main() {
   
   // 设置 StakingPool 的合约引用
   console.log("   设置 StakingPool 合约引用...");
-  await stakingPool.setContracts(referralSystemAddress, deployer.address, compoundPoolAddress);
+  await stakingPool.setContracts(referralSystemAddress, dividendPoolAddress, compoundPoolAddress);
   console.log("   ✅ ReferralSystem:", referralSystemAddress);
+  console.log("   ✅ DividendPool:", dividendPoolAddress);
   console.log("   ✅ CompoundPool:", compoundPoolAddress);
   
   // 设置 CompoundPool 的 StakingPool 地址
@@ -123,12 +152,18 @@ async function main() {
   // 授权 StakingPool
   console.log("   授权 StakingPool 使用 ETR...");
   const approveAmount = ethers.parseEther("1000000"); // 100 万 ETR
-  await etrToken.approve(stakingPoolAddress, approveAmount);
+  const approveTx = await etrToken.approve(stakingPoolAddress, approveAmount);
+  await approveTx.wait(); // 等待授权交易确认
   console.log("   ✅ 授权成功:", ethers.formatEther(approveAmount), "ETR");
+  
+  // 检查授权额度
+  const allowance = await etrToken.allowance(deployer.address, stakingPoolAddress);
+  console.log("   授权额度:", ethers.formatEther(allowance), "ETR");
   
   // 充值奖励池
   console.log("   充值奖励池...");
-  await stakingPool.fundRewardPool(testAmount);
+  const fundTx = await stakingPool.fundRewardPool(testAmount);
+  await fundTx.wait(); // 等待充值交易确认
   console.log("   ✅ 充值成功:", ethers.formatEther(testAmount), "ETR");
   
   const rewardPoolBalance = await stakingPool.getRewardPoolBalance();
@@ -149,6 +184,8 @@ async function main() {
       StakingPoolV2: stakingPoolAddress,
       CompoundPoolV2: compoundPoolAddress,
       ReferralSystem: referralSystemAddress,
+      DividendPool: dividendPoolAddress,
+      SlippageController: slippageControllerAddress,
       USDT: USDT_ADDRESS,
     },
     config: {
@@ -179,8 +216,10 @@ async function main() {
     StakingPool: '${stakingPoolAddress}',
     CompoundPool: '${compoundPoolAddress}',
     ReferralSystem: '${referralSystemAddress}',
+    DividendPool: '${dividendPoolAddress}',
+    SlippageController: '${slippageControllerAddress}',
     PriceOracle: '${deployer.address}', // 临时使用部署者地址
-    Router: '0xD99D1c33F9fC3444f8101754aBC46c52416550D1',
+    Router: '0xD99D1c33F9fC3444f8101754aBC46c52416550D1', // PancakeSwap Router
   }
   `);
   
