@@ -8,12 +8,15 @@
     "StakingPoolV2": "0xeEfEb6C343c16410F5Dee200D71fC20DCE6c016e",
     "CompoundPoolV2": "0x39140fc1715c5E4aaCC711F2eAA5a00D0A3f3A57",
     "ReferralSystem": "0x73bc5e6C363Af763150D7F6803Ed155EE891c97E",
-    "USDT": "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd"
+    "USDT": "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd",
+    "DividendPool": "0xB26F164ff351F1A3bF62dc6D35123b386Fc6Df4b",
+    "SlippageController": "0xA17B5F1598d08C1307345335f264eBE45b9977a9"
   },
   "config": {
     "etrPriceUSD": "0.25",
     "lockPeriodDays": 50,
     "dailyYieldRate": "0.45%",
     "dailyUnlockRate": "2%"
-  }
+  },
+  "completedAt": "2026-03-30T10:34:33.146Z"
 }
