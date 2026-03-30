@@ -2,8 +2,7 @@
  * 合约地址配置 - ETR DApp V3
  * 
  * 部署网络：BSC Testnet (ChainId: 97)
- * 部署时间：2026-03-29
- * 新增：stakeETR(), stakeETRBatch() 函数
+ * 部署时间：2026-03-30
  */
 export const CONTRACT_ADDRESSES = {
   // BSC 主网
@@ -16,15 +15,15 @@ export const CONTRACT_ADDRESSES = {
     PriceOracle: '0x4343d520a0e6182d22ec0c0134508571e782a0AB',
     Router: '0x10ED43C718714eb63d5aA57B78B54704E256024E', // PancakeSwap V2 Router
   },
-  // BSC 测试网 - 2026-03-29 新部署
+  // BSC 测试网 - 2026-03-30 新部署
   bscTestnet: {
-    ETRToken: '0xF3A8668E985f98fCCf1922e325C0f6AbE0ef1378',
-    StakingPool: '0xFA731574ad5666F986aa1Bf2F512365e772F294E',
-    CompoundPool: '0xb058C1298aEe7f94e7769D293F0880bb58b7B703',
-    DividendPool: '0x77e670EE1D0B4461B7399cf86f8624373FEB6b84', // 待部署
-    ReferralSystem: '0xee653fAEF9F3842C5CE5A1b9fBf4503bC1DDf825',
-    PriceOracle: '0xBF73DB25F5f58d206f1eaE05492ccb5643C08A38',
-    SlippageController: '0xF6b61E9a65607198Ababe08c071Ae9EaEaBee0A', // 待部署
+    ETRToken: '0xB58d5fFc11E96af337D6C06b41F2DcD509aFaBcF',
+    StakingPool: '0xeEfEb6C343c16410F5Dee200D71fC20DCE6c016e',
+    CompoundPool: '0x39140fc1715c5E4aaCC711F2eAA5a00D0A3f3A57',
+    ReferralSystem: '0x73bc5e6C363Af763150D7F6803Ed155EE891c97E',
+    DividendPool: '0xB26F164ff351F1A3bF62dc6D35123b386Fc6Df4b',
+    SlippageController: '0xA17B5F1598d08C1307345335f264eBE45b9977a9',
+    PriceOracle: '0x4343d520a0e6182d22ec0c0134508571e782a0AB',
     Router: '0xD99D1c33F9fC3444f8101754aBC46c52416550D1', // PancakeSwap V2 Router Testnet
   },
 } as const;
