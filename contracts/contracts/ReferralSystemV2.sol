@@ -364,6 +364,77 @@ contract ReferralSystemV2 is Ownable, Pausable, ReentrancyGuard {
     }
     
     /**
+     * @dev 计算用户的详细推荐奖励（包含每条线）
+     * @param referrer 推荐人地址
+     * @return totalReward 总奖励金额
+     * @return lineDetails 每条直推线的奖励详情
+     */
+    function calculateReferralRewardsWithDetails(address referrer) 
+        external 
+        view 
+        returns (
+            uint256 totalReward,
+            LineRewardDetail[] memory lineDetails
+        )
+    {
+        (uint256 fRate, uint256 sRate, uint256 tRate) = _getRates(referrer);
+        address[] memory directs = directReferrals[referrer];
+        
+        lineDetails = new LineRewardDetail[](directs.length);
+        uint256 total;
+        
+        for (uint i = 0; i < directs.length; i++) {
+            address direct = directs[i];
+            uint256 directStakeValue = _getStakingPool().getUserPortfolioValue(direct);
+            
+            // 第一代奖励
+            uint256 firstGen = (directStakeValue * 45 / BPS_DENOMINATOR) * fRate / BPS_DENOMINATOR;
+            
+            // 第二代奖励
+            uint256 secondGenTeamStake = _getTeamStake(direct);
+            uint256 secondGen = (secondGenTeamStake * 45 / BPS_DENOMINATOR) * sRate / BPS_DENOMINATOR;
+            
+            // 第三代奖励
+            uint256 thirdGenTeamStake = _getSecondGenTeamStake(direct);
+            uint256 thirdGen = (thirdGenTeamStake * 45 / BPS_DENOMINATOR) * tRate / BPS_DENOMINATOR;
+            
+            lineDetails[i] = LineRewardDetail({
+                direct: direct,
+                firstGen: firstGen,
+                secondGen: secondGen,
+                thirdGen: thirdGen,
+                lineTotal: firstGen + secondGen + thirdGen
+            });
+            
+            total += firstGen + secondGen + thirdGen;
+        }
+        
+        return (total, lineDetails);
+    }
+    
+    /**
+     * @dev 获取用户的团队总质押（第一代）
+     */
+    function _getTeamStake(address referrer) internal view returns (uint256 totalStake) {
+        address[] memory directs = directReferrals[referrer];
+        for (uint i = 0; i < directs.length; i++) {
+            totalStake += _getStakingPool().getUserPortfolioValue(directs[i]);
+        }
+        return totalStake;
+    }
+    
+    /**
+     * @dev 获取第二代团队总质押
+     */
+    function _getSecondGenTeamStake(address referrer) internal view returns (uint256 totalStake) {
+        address[] memory directs = directReferrals[referrer];
+        for (uint i = 0; i < directs.length; i++) {
+            totalStake += _getTeamStake(directs[i]);
+        }
+        return totalStake;
+    }
+    
+    /**
      * @dev 获取第二代人数（间推）
      * @param referrer 推荐人地址
      * @return count 间推人数

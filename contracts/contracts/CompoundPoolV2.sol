@@ -267,9 +267,28 @@ contract CompoundPoolV2 is Ownable, Pausable, ReentrancyGuard {
     /**
      * @dev 查询复利池总额（本金 + 累计收益，触发计算）
      */
-    function getTotalCompound(address user) external returns (uint256) {
-        _calculateCompound(user);
-        return compoundBalances[user];
+    function getTotalCompound(address user) external view returns (uint256) {
+        uint256 balance = compoundBalances[user];
+        if (balance == 0) {
+            return 0;
+        }
+        
+        uint256 lastTime = lastCompoundTime[user];
+        if (lastTime == 0) {
+            return balance;
+        }
+        
+        uint256 timeElapsed = block.timestamp - lastTime;
+        if (timeElapsed < SECONDS_PER_DAY) {
+            return balance;
+        }
+        
+        uint256 daysElapsed = timeElapsed / SECONDS_PER_DAY;
+        
+        // 复利计算：复利 = 余额 × 日化率 × 天数 / 10000
+        uint256 compoundAmount = balance * currentYieldRate * daysElapsed / BPS_DENOMINATOR;
+        
+        return balance + compoundAmount;
     }
     
     /**

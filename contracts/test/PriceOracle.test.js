@@ -55,8 +55,8 @@ describe("PriceOracle", function () {
       const expectedPrice = ethers.parseEther("0.1");
       
       // 允许0.1%的误差
-      const tolerance = expectedPrice.mul(1).div(1000);
-      expect(price).to.be.closeTo(expectedPrice, tolerance);
+      const tolerance = expectedPrice / 1000n;
+      expect(Number(price)).to.be.closeTo(Number(expectedPrice), Number(tolerance));
     });
 
     it("Should return 0 if reserves are zero", async function () {
@@ -104,8 +104,18 @@ describe("PriceOracle", function () {
       const tx = await priceOracle.updatePrice();
       const receipt = await tx.wait();
       
-      // 检查事件
-      const event = receipt.events.find(e => e.event === "PriceUpdated");
+      // 检查事件 - ethers v6 使用 logs
+      const priceOracleInterface = priceOracle.interface;
+      const event = receipt.logs
+        .map(log => {
+          try {
+            return priceOracleInterface.parseLog(log);
+          } catch (e) {
+            return null;
+          }
+        })
+        .find(event => event && event.name === "PriceUpdated");
+      
       expect(event).to.not.be.undefined;
     });
   });

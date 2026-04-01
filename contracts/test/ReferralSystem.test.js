@@ -165,8 +165,15 @@ describe("ReferralSystem", function () {
   describe("30-Cap Rule", function () {
     it("Should track 30 direct referrals", async function () {
       // 创建30个推荐关系
+      // 注意：Hardhat 默认只有 20 个账户，需要创建新钱包
       for (let i = 0; i < 30; i++) {
-        const wallet = addrs[i];
+        const wallet = ethers.Wallet.createRandom().connect(ethers.provider);
+        // 给钱包转一些 ETH 用于部署
+        await owner.sendTransaction({
+          to: wallet.address,
+          value: ethers.parseEther("1")
+        });
+        
         await mockStakingPool.setValidAccount(wallet.address, true);
         await mockStakingPool.setPortfolioValue(wallet.address, ethers.parseEther("100"));
         await referralSystem.connect(wallet).bindReferrerSelf(user1.address);
